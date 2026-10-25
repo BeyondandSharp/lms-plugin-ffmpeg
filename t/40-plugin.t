@@ -250,6 +250,31 @@ subtest 'settings handler normalises checkbox/mode values' => sub {
 	is($params->{ffmpegStatus}->{source}, 'configured', 'status is fresh');
 };
 
+# ----------------------------------------------------------------------------
+# Chinese (ZH_CN) UI strings: every token in strings.txt must have one.
+# ----------------------------------------------------------------------------
+{
+	open my $fh, '<:utf8', 'strings.txt' or die "strings.txt: $!";
+	local $/;
+	my $strings = <$fh>;
+	close $fh;
+
+	my (%tokens, $token);
+	for my $line (split /\r?\n/, $strings) {
+		if ($line =~ /^([A-Z][A-Z0-9_]*)\s*$/) {
+			$token = $1;
+			$tokens{$token} = 0;
+		}
+		elsif (defined $token && $line =~ /^\tZH_CN\t/) {
+			$tokens{$token} = 1;
+		}
+	}
+
+	my @missing = sort grep { !$tokens{$_} } keys %tokens;
+	is_deeply(\@missing, [], 'every UI token has a ZH_CN translation')
+		or diag('Tokens without ZH_CN: ' . join(', ', @missing));
+}
+
 done_testing();
 
 # ----------------------------------------------------------------------------

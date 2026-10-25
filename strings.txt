@@ -2,140 +2,175 @@
 
 PLUGIN_FFMPEG
 	EN	FFmpeg
+	ZH_CN	FFmpeg
 	DE	FFmpeg
 
 PLUGIN_FFMPEG_DESCRIPTION
 	EN	Use ffmpeg to decode all audio formats supported by Lyrion Music Server (transcoding only)
+	ZH_CN	使用 ffmpeg 解码 Lyrion Music Server 支持的所有音频格式（仅转码）
 	DE	FFmpeg zur Dekodierung aller von Lyrion Music Server unterstützten Audioformate verwenden (nur Transkodierung)
 
 PLUGIN_FFMPEG_STATUS
 	EN	FFmpeg status
+	ZH_CN	FFmpeg 状态
 	DE	FFmpeg-Status
 
 PLUGIN_FFMPEG_STATUS_DESC
 	EN	Information about the currently used ffmpeg/ffprobe binaries and the active conversion profiles.
+	ZH_CN	当前使用的 ffmpeg/ffprobe 程序及活动转码配置信息。
 	DE	Informationen über die aktuell verwendeten ffmpeg/ffprobe-Programme und die aktiven Konvertierungsprofile.
 
 PLUGIN_FFMPEG_STATUS_BINARY
 	EN	Binary
+	ZH_CN	程序
 	DE	Programm
 
 PLUGIN_FFMPEG_STATUS_NOT_FOUND
 	EN	not found
+	ZH_CN	未找到
 	DE	nicht gefunden
 
 PLUGIN_FFMPEG_STATUS_SOURCE
 	EN	Source
+	ZH_CN	来源
 	DE	Quelle
 
 PLUGIN_FFMPEG_SOURCE_CONFIGURED
 	EN	configured
+	ZH_CN	手动配置
 	DE	konfiguriert
 
 PLUGIN_FFMPEG_SOURCE_SYSTEM
 	EN	system
+	ZH_CN	系统
 	DE	System
 
 PLUGIN_FFMPEG_SOURCE_NONE
 	EN	none
+	ZH_CN	无
 	DE	keine
 
 PLUGIN_FFMPEG_STATUS_VERSION
 	EN	ffmpeg version
+	ZH_CN	ffmpeg 版本
 	DE	ffmpeg-Version
 
 PLUGIN_FFMPEG_STATUS_FFPROBE
 	EN	ffprobe
+	ZH_CN	ffprobe
 	DE	ffprobe
 
 PLUGIN_FFMPEG_STATUS_FFPROBE_VERSION
 	EN	ffprobe version
+	ZH_CN	ffprobe 版本
 	DE	ffprobe-Version
 
 PLUGIN_FFMPEG_STATUS_ERROR
 	EN	Error
+	ZH_CN	错误
 	DE	Fehler
 
 PLUGIN_FFMPEG_STATUS_WARNING
 	EN	Warning
+	ZH_CN	警告
 	DE	Warnung
 
 PLUGIN_FFMPEG_STATUS_PROFILES
 	EN	Conversion profiles
+	ZH_CN	转码配置
 	DE	Konvertierungsprofile
 
 PLUGIN_FFMPEG_STATUS_PROFILES_COUNT
 	EN	active ffmpeg profiles:
+	ZH_CN	活动 ffmpeg 配置数：
 	DE	aktive ffmpeg-Profile:
 
 PLUGIN_FFMPEG_STATUS_DSD_PROFILES_COUNT
 	EN	of which DSD:
+	ZH_CN	其中 DSD：
 	DE	davon DSD:
 
 PLUGIN_FFMPEG_BINARY_SECTION
 	EN	FFmpeg binaries
+	ZH_CN	FFmpeg 程序
 	DE	FFmpeg-Programme
 
 PLUGIN_FFMPEG_BINARY_SECTION_DESC
 	EN	Leave the fields empty to let Lyrion Music Server find ffmpeg in the system PATH. If a path is configured, that exact executable is used.
+	ZH_CN	留空让 Lyrion Music Server 在系统 PATH 中查找 ffmpeg；填写路径则使用指定的程序。
 	DE	Felder leer lassen, damit Lyrion Music Server ffmpeg im System-PATH findet. Ist ein Pfad konfiguriert, wird genau dieses Programm verwendet.
 
 PLUGIN_FFMPEG_FFMPEG_PATH
 	EN	ffmpeg executable
+	ZH_CN	ffmpeg 可执行文件
 	DE	ffmpeg-Programm
 
 PLUGIN_FFMPEG_FFMPEG_PATH_DESC
 	EN	Absolute path to the ffmpeg binary, e.g. /usr/bin/ffmpeg.
+	ZH_CN	ffmpeg 可执行文件的绝对路径，例如 /usr/bin/ffmpeg。
 	DE	Absoluter Pfad zum ffmpeg-Programm, z. B. /usr/bin/ffmpeg.
 
 PLUGIN_FFMPEG_FFPROBE_PATH
 	EN	ffprobe executable
+	ZH_CN	ffprobe 可执行文件
 	DE	ffprobe-Programm
 
 PLUGIN_FFMPEG_FFPROBE_PATH_DESC
 	EN	Absolute path to the ffprobe binary. If empty, ffprobe next to the ffmpeg binary or in the system PATH is used.
+	ZH_CN	ffprobe 可执行文件的绝对路径；留空则使用 ffmpeg 同目录或系统 PATH 中的 ffprobe。
 	DE	Absoluter Pfad zum ffprobe-Programm. Leer: ffprobe neben ffmpeg oder im System-PATH wird verwendet.
 
 PLUGIN_FFMPEG_FALLBACK_TO_SYSTEM
 	EN	Fall back to the system ffmpeg
+	ZH_CN	回退到系统 ffmpeg
 	DE	Auf System-ffmpeg zurückfallen
 
 PLUGIN_FFMPEG_FALLBACK_TO_SYSTEM_DESC
 	EN	If the configured binary is invalid or not executable, use a system-wide ffmpeg instead.
+	ZH_CN	配置的程序无效或不可执行时，改用系统范围内的 ffmpeg。
 	DE	Ist das konfigurierte Programm ungültig oder nicht ausführbar, stattdessen ein systemweites ffmpeg verwenden.
 
 PLUGIN_FFMPEG_MODE_SECTION
 	EN	Usage
+	ZH_CN	使用方式
 	DE	Verwendung
 
 PLUGIN_FFMPEG_MODE_SECTION_DESC
 	EN	Define whether ffmpeg is only used when no native converter is available, or whether ffmpeg is always preferred.
+	ZH_CN	设置仅在缺少原生转换器时使用 ffmpeg，或始终优先使用 ffmpeg。
 	DE	Festlegen, ob ffmpeg nur verwendet wird, wenn kein nativer Konverter verfügbar ist, oder ob ffmpeg immer bevorzugt wird.
 
 PLUGIN_FFMPEG_MODE_FALLBACK
 	EN	fallback: native converters first, ffmpeg only if needed
+	ZH_CN	回退：优先原生转换器，需要时才用 ffmpeg
 	DE	Fallback: zuerst native Konverter, ffmpeg nur bei Bedarf
 
 PLUGIN_FFMPEG_MODE_PREFER
 	EN	prefer: always use ffmpeg first
+	ZH_CN	优先：始终先使用 ffmpeg
 	DE	Bevorzugen: immer zuerst ffmpeg verwenden
 
 PLUGIN_FFMPEG_MODE_DESC
 	EN	This changes the order of the conversion profile instances only; it does not modify any scanner or tag handling.
+	ZH_CN	仅调整转码配置的排序，不修改扫描或标签处理。
 	DE	Dies ändert nur die Reihenfolge der Konvertierungsprofile; Scanner- oder Tag-Verarbeitung bleibt unberührt.
 
 PLUGIN_FFMPEG_DSD_SECTION
 	EN	DSD (experimental)
+	ZH_CN	DSD（实验性）
 	DE	DSD (experimentell)
 
 PLUGIN_FFMPEG_DSD_SECTION_DESC
 	EN	Enable experimental DSD conversion (dsf/dff/WavPack DSD to FLAC at 176400Hz).
+	ZH_CN	启用实验性 DSD 转码（dsf/dff/WavPack DSD 转为 176400Hz FLAC）。
 	DE	Experimentelle DSD-Konvertierung aktivieren (dsf/dff/WavPack-DSD nach FLAC mit 176400 Hz).
 
 PLUGIN_FFMPEG_ENABLE_DSD
 	EN	Enable DSD conversion
+	ZH_CN	启用 DSD 转码
 	DE	DSD-Konvertierung aktivieren
 
 PLUGIN_FFMPEG_ENABLE_DSD_DESC
 	EN	When disabled (the default), dff/dsf/wvpx ffmpeg profiles are removed and DSD playback is left to the native converters.
+	ZH_CN	关闭时（默认），dff/dsf/wvpx 的 ffmpeg 配置会被移除，DSD 播放交给原生转换器。
 	DE	Wenn deaktiviert (Standard), werden dff/dsf/wvpx-ffmpeg-Profile entfernt und DSD-Wiedergabe den nativen Konvertern überlassen.

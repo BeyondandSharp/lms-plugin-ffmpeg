@@ -44,6 +44,7 @@ LMS' native converters.
   and live information about the resolved binaries/versions and the number of
   active conversion profiles.
 * CLI: `ffmpeg status ?` query and `ffmpeg reload` command.
+* English and Simplified Chinese (`ZH_CN`) UI strings.
 
 ## Requirements
 
