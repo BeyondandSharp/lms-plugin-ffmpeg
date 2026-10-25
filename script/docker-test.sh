@@ -663,6 +663,16 @@ run_version() {
 		return 1
 	}
 
+	local plugin_mount="$PLUGIN_DIR"
+	if [ -x "$PLUGIN_DIR/build.sh" ]; then
+		"$PLUGIN_DIR/build.sh" --no-test --no-archive >/dev/null || {
+			FAIL=$((FAIL + 1))
+			say "not ok - FFmpeg build.sh failed"
+			return 1
+		}
+		plugin_mount="$PLUGIN_DIR/dist/FFmpeg"
+	fi
+
 	vlog "starting container $CONTAINER (ports $HTTP_PORT/$CLI_PORT/$SLIMPROTO_PORT)"
 
 	if ! docker run -d --name "$CONTAINER" \
@@ -670,7 +680,7 @@ run_version() {
 		-p "$HTTP_PORT:$HTTP_PORT" \
 		-p "$CLI_PORT:9090" \
 		-p "$SLIMPROTO_PORT:3483" \
-		-v "$PLUGIN_DIR:/lms/Plugins/FFmpeg:ro" \
+		-v "$plugin_mount:/lms/Plugins/FFmpeg:ro" \
 		-v "$WORK_DIR/music:/music:ro" \
 		-v "$SCRIPT_DIR/fixtures:/fixtures:ro" \
 		"$tag" >/dev/null; then

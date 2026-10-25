@@ -8,7 +8,7 @@ scanning, tagging or the library database in any way. It only adds
 `custom-convert.conf` conversion profiles and controls their order relative to
 LMS' native converters.
 
-* Version: see [VERSION](VERSION) (currently 0.1.0)
+* Version: see [VERSION](VERSION)
 * License: GPL-2.0 (see [LICENSE](LICENSE))
 * LMS compatibility: 9.0.0 up to 9.x (`minVersion=9.0.0`, `maxVersion=9.*`)
 
@@ -57,11 +57,35 @@ LMS' native converters.
 The plugin does **not** bundle or download ffmpeg. Install it with your
 operating system or distribution package manager.
 
+## Building
+
+The plugin version is stored only in [VERSION](VERSION). Run the one-click
+build from the repository root:
+
+```sh
+./build.sh                 # run unit tests, build folder + archives
+./build.sh --no-test       # skip unit tests
+./build.sh --no-archive    # only create dist/FFmpeg/
+```
+
+The script renders `build/install.xml` from the tracked `install.xml.in`
+template and creates:
+
+```
+dist/FFmpeg/                 # ready to copy into <LMS>/Plugins/
+dist/FFmpeg-<VERSION>.zip    # LMS plugin-manager archive
+dist/FFmpeg-<VERSION>.tar.gz # portable archive
+```
+
+`make dist` calls the same script. Never edit `install.xml` by hand; change
+`VERSION` (and, if needed, `install.xml.in`) instead.
+
 ## Installation
 
-1. Copy/install this repository into the LMS plugin directory, e.g.
+1. Run `./build.sh` and copy `dist/FFmpeg/` to the LMS plugin directory, e.g.
    `<cache>/InstalledPlugins/Plugins/FFmpeg` or `/config/cache/Plugins/FFmpeg`
-   for the Docker image (the directory must contain `install.xml`).
+   for the Docker image (the installed directory must contain the generated
+   `install.xml`). Release archives unpack to the same layout.
 2. Restart Lyrion Music Server.
 3. Open *Settings → Advanced → FFmpeg* (the plugin's settings page) and
    configure the binary paths and the desired mode.

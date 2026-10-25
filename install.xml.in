@@ -1,8 +1,9 @@
 <?xml version="1.0"?>
+<!-- Template: rendered to build/install.xml from VERSION by build.sh. -->
 <extension>
 	<name>PLUGIN_FFMPEG</name>
 	<module>Plugins::FFmpeg::Plugin</module>
-	<version>0.1.0</version>
+	<version>@VERSION@</version>
 	<description>PLUGIN_FFMPEG_DESCRIPTION</description>
 	<creator>Lyrion Community</creator>
 	<category>tools</category>

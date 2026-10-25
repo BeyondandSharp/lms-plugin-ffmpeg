@@ -6,7 +6,7 @@
 本插件只做转码，**不会**修改扫描、标签读取或音乐库数据库。它只提供
 `custom-convert.conf` 转码配置，并调整这些配置相对 LMS 原生转换器的优先顺序。
 
-* 版本：见 [VERSION](VERSION)（当前为 0.1.0）
+* 版本：见 [VERSION](VERSION)
 * 许可证：GPL-2.0（见 [LICENSE](LICENSE)）
 * 兼容性：LMS 9.0.0 至 9.x（`minVersion=9.0.0`、`maxVersion=9.*`）
 
@@ -45,11 +45,33 @@
 
 本插件**不捆绑、不下载** ffmpeg，请通过操作系统或软件包管理器安装。
 
+## 构建
+
+插件版本只存放在 [VERSION](VERSION) 这一个文件里。在仓库根目录执行一键构建：
+
+```sh
+./build.sh                 # 运行单元测试，生成目录和压缩包
+./build.sh --no-test       # 跳过单元测试
+./build.sh --no-archive    # 只生成 dist/FFmpeg/
+```
+
+脚本会从受版本控制的 `install.xml.in` 模板渲染 `build/install.xml`，并生成：
+
+```
+dist/FFmpeg/                 # 可直接复制到 <LMS>/Plugins/
+dist/FFmpeg-<VERSION>.zip    # LMS 插件管理器压缩包
+dist/FFmpeg-<VERSION>.tar.gz # 通用压缩包
+```
+
+`make dist` 调用同一个脚本。不要手工修改 `install.xml`；需要改版本时只修改
+`VERSION`（必要时再改 `install.xml.in`）。
+
 ## 安装
 
-1. 将本仓库安装到 LMS 插件目录，例如
+1. 运行 `./build.sh`，把 `dist/FFmpeg/` 复制到 LMS 插件目录，例如
    `<cache>/InstalledPlugins/Plugins/FFmpeg`；Docker 镜像中为
-   `/config/cache/Plugins/FFmpeg`（目录中必须包含 `install.xml`）。
+   `/config/cache/Plugins/FFmpeg`（安装目录中必须包含生成的
+   `install.xml`）。发布压缩包解压后是同样的目录结构。
 2. 重启 Lyrion Music Server。
 3. 打开 *设置 → 高级 → FFmpeg* 配置程序路径与模式。
 4. 播放音乐。在 `fallback` 模式下，只有原本无法转码时才会用到 ffmpeg。

@@ -6,6 +6,7 @@ use warnings;
 
 use Config;
 use File::Spec::Functions qw(catfile catdir);
+use File::Temp qw(tempfile);
 use Test::More;
 
 my $lms = $ENV{LMS_HOME};
@@ -110,12 +111,19 @@ ok(-f catfile('HTML', 'EN', 'plugins', 'FFmpeg', 'settings.html'),
 # ----------------------------------------------------------------------------
 # install.xml must declare the plugin correctly for this LMS version
 # ----------------------------------------------------------------------------
-my $install = read_file('install.xml');
-ok(defined $install, 'install.xml can be read') or done_testing();
+my $version = read_file('VERSION');
+defined $version or done_testing();
+$version =~ s/^\s+|\s+$//g;
+
+my $template = read_file('install.xml.in');
+ok(defined $template, 'install.xml.in can be read') or done_testing();
+
+my $install = $template;
+$install =~ s/\@VERSION\@/$version/g;
 
 like($install, qr{<name>PLUGIN_FFMPEG</name>}, 'install.xml name is PLUGIN_FFMPEG');
 like($install, qr{<module>Plugins::FFmpeg::Plugin</module>}, 'install.xml module is Plugins::FFmpeg::Plugin');
-like($install, qr{<version>\Q0.1.0\E</version>}, 'install.xml version is 0.1.0');
+like($install, qr{<version>\Q$version\E</version>}, 'rendered install.xml version matches VERSION');
 like($install, qr{<category>tools</category>}, 'install.xml category is tools');
 like($install, qr{<defaultState>enabled</defaultState>}, 'install.xml defaultState is enabled');
 like($install, qr{<optionsURL>plugins/FFmpeg/settings\.html</optionsURL>}, 'install.xml optionsURL');
@@ -132,14 +140,18 @@ SKIP: {
 	skip 'XML::Simple not available on this Perl', 5 unless $have_xml;
 
 	require XML::Simple;
-	my $xml = eval { XML::Simple::XMLin('install.xml', SuppressEmpty => undef) };
+	my ($fh, $tmp) = tempfile(SUFFIX => '.xml');
+	print {$fh} $install;
+	close $fh;
+	my $xml = eval { XML::Simple::XMLin($tmp, SuppressEmpty => undef) };
+	unlink $tmp;
 
 	ok(ref $xml eq 'HASH', 'install.xml parses as XML') or skip 'invalid install.xml', 4;
 
 	is($xml->{module}, 'Plugins::FFmpeg::Plugin', 'parsed module');
 	is($xml->{targetApplication}->{minVersion}, '9.0.0', 'parsed minVersion');
 	is($xml->{targetApplication}->{maxVersion}, '9.*', 'parsed maxVersion');
-	is($xml->{version}, '0.1.0', 'parsed version');
+	is($xml->{version}, $version, 'parsed version');
 }
 
 # ----------------------------------------------------------------------------

@@ -1,15 +1,13 @@
 # Makefile for the Lyrion Music Server FFmpeg plugin
 #
 # The plugin is pure Perl; there is nothing to compile.  The interesting
-# targets are "test" (unit tests) and "conf" (regenerate custom-convert.conf).
+# targets are "test" (unit tests), "conf" (regenerate custom-convert.conf)
+# and "dist" (one-click release build, delegated to build.sh).
 
 PLUGIN    = FFmpeg
 VERSION   = $(shell cat VERSION)
 PERL     ?= perl
 PROVE    ?= prove
-
-FILES = install.xml lib HTML custom-convert.conf strings.txt VERSION \
-	LICENSE README.md README.zh-CN.md THIRD_PARTY_NOTICES.md tools script
 
 .PHONY: all conf test syntax docker-test clean dist
 
@@ -40,12 +38,17 @@ docker-test:
 	./script/docker-test.sh
 
 clean:
-	rm -rf build
+	rm -rf build dist
 	rm -rf .prove
 	rm -f script/fixtures/*.log
 
-dist: test
-	@mkdir -p build
-	@rm -f build/$(PLUGIN)-$(VERSION).zip
-	@zip -qr build/$(PLUGIN)-$(VERSION).zip $(FILES)
-	@echo "Created build/$(PLUGIN)-$(VERSION).zip"
+# One-click release build: VERSION -> build/install.xml -> dist/FFmpeg/ +
+# dist/FFmpeg-<VERSION>.zip/.tar.gz.  build.sh runs the unit tests first.
+dist:
+	./build.sh
+
+verify-dist:
+	@test -f "dist/FFmpeg/install.xml" || (echo "missing dist/FFmpeg/install.xml; run make dist" >&2; exit 1)
+	@test -d "dist/FFmpeg/lib/Plugins/FFmpeg" || (echo "missing dist/FFmpeg/lib/Plugins/FFmpeg" >&2; exit 1)
+	@grep -qF "<version>$$(tr -d '[:space:]' < VERSION)</version>" "dist/FFmpeg/install.xml" || (echo "dist/install.xml version mismatch" >&2; exit 1)
+	@echo "dist/FFmpeg looks complete."
