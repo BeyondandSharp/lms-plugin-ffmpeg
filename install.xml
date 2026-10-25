@@ -1,0 +1,20 @@
+<?xml version="1.0"?>
+<extension>
+	<name>PLUGIN_FFMPEG</name>
+	<module>Plugins::FFmpeg::Plugin</module>
+	<version>0.1.0</version>
+	<description>PLUGIN_FFMPEG_DESCRIPTION</description>
+	<creator>Lyrion Community</creator>
+	<category>tools</category>
+
+	<defaultState>enabled</defaultState>
+
+	<optionsURL>plugins/FFmpeg/settings.html</optionsURL>
+	<type>2</type>
+
+	<targetApplication>
+		<id>Lyrion Music Server</id>
+		<minVersion>9.0.0</minVersion>
+		<maxVersion>9.*</maxVersion>
+	</targetApplication>
+</extension>

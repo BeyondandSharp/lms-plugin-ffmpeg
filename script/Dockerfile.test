@@ -1,0 +1,38 @@
+# Docker test image for the Lyrion Music Server FFmpeg plugin.
+#
+# Builds on top of the official Lyrion Music Server images and adds the
+# external tools needed by the integration tests:
+#   - ffmpeg / ffprobe: the binaries under test
+#   - sqlite3: verification of the scanned library (content types, urls)
+#   - netcat-openbsd / procps: debugging helpers inside the container
+#
+# Usage (normally done by script/docker-test.sh):
+#   docker build -f script/Dockerfile.test \
+#       --build-arg LMS_IMAGE=lmscommunity/lyrionmusicserver:9.1.1 \
+#       -t lms-plugin-ffmpeg-test:9.1.1 script
+#
+# This file is part of the Lyrion Music Server FFmpeg plugin and licensed
+# under the GNU General Public License, version 2.
+
+ARG LMS_IMAGE=lmscommunity/lyrionmusicserver:9.1.1
+FROM ${LMS_IMAGE}
+
+USER root
+
+ENV DEBIAN_FRONTEND=noninteractive
+
+RUN apt-get update -qq && \
+	apt-get install -y --no-install-recommends \
+		ffmpeg \
+		sqlite3 \
+		netcat-openbsd \
+		procps \
+		ca-certificates && \
+	apt-get clean && \
+	rm -rf /var/lib/apt/lists/*
+
+# The tests mount the plugin itself at /lms/Plugins/FFmpeg and the fixtures at
+# /music.  Nothing else needs to be baked into the image.
+LABEL org.lyrion.plugin="FFmpeg" \
+	org.lyrion.test-image="true" \
+	org.lyrion.description="Lyrion Music Server + ffmpeg/sqlite3 for FFmpeg plugin integration tests"

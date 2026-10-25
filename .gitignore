@@ -1,0 +1,9 @@
+/dist/
+/build/
+/tmp/
+*.log
+*.bak
+.DS_Store
+# temporary files created by the docker integration tests
+/script/fixtures/*.log
+/script/fixtures/*.marker

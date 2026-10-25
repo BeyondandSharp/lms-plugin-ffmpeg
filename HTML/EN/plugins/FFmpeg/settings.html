@@ -1,0 +1,101 @@
+[% PROCESS settings/header.html %]
+
+[% IF ffmpegStatus %]
+[% WRAPPER settingSection %]
+	[% WRAPPER settingGroup title="PLUGIN_FFMPEG_STATUS" desc="PLUGIN_FFMPEG_STATUS_DESC" %]
+		<table style="border-collapse: collapse; width: auto;">
+			<tr>
+				<td style="padding-right: 1em;"><b>[% 'PLUGIN_FFMPEG_STATUS_BINARY' | string %]</b></td>
+				<td colSpan="2">
+					[% IF ffmpegStatus.ffmpeg %]
+						[% ffmpegStatus.ffmpeg | html %]
+					[% ELSE %]
+						<span style="color: #c00;">[% 'PLUGIN_FFMPEG_STATUS_NOT_FOUND' | string %]</span>
+					[% END %]
+				</td>
+			</tr>
+			<tr>
+				<td style="padding-right: 1em;"><b>[% 'PLUGIN_FFMPEG_STATUS_SOURCE' | string %]</b></td>
+				<td colSpan="2">
+					[% IF ffmpegStatus.source == 'configured' %]
+						[% 'PLUGIN_FFMPEG_SOURCE_CONFIGURED' | string %]
+					[% ELSIF ffmpegStatus.source == 'system' %]
+						[% 'PLUGIN_FFMPEG_SOURCE_SYSTEM' | string %]
+					[% ELSE %]
+						[% 'PLUGIN_FFMPEG_SOURCE_NONE' | string %]
+					[% END %]
+				</td>
+			</tr>
+			<tr>
+				<td style="padding-right: 1em;"><b>[% 'PLUGIN_FFMPEG_STATUS_VERSION' | string %]</b></td>
+				<td colSpan="2">[% IF ffmpegStatus.version %][% ffmpegStatus.version | html %][% ELSE %]-[% END %]</td>
+			</tr>
+			<tr>
+				<td style="padding-right: 1em;"><b>[% 'PLUGIN_FFMPEG_STATUS_FFPROBE' | string %]</b></td>
+				<td colSpan="2">[% IF ffmpegStatus.ffprobe %][% ffmpegStatus.ffprobe | html %][% ELSE %]-[% END %]</td>
+			</tr>
+			<tr>
+				<td style="padding-right: 1em;"><b>[% 'PLUGIN_FFMPEG_STATUS_FFPROBE_VERSION' | string %]</b></td>
+				<td colSpan="2">[% IF ffmpegStatus.ffprobe_version %][% ffmpegStatus.ffprobe_version | html %][% ELSE %]-[% END %]</td>
+			</tr>
+			[% IF !ffmpegStatus.ok && ffmpegStatus.error %]
+			<tr>
+				<td style="padding-right: 1em;"><b>[% 'PLUGIN_FFMPEG_STATUS_ERROR' | string %]</b></td>
+				<td colSpan="2" style="color: #c00;">[% ffmpegStatus.error | html %]</td>
+			</tr>
+			[% END %]
+			[% IF ffmpegStatus.ok && ffmpegStatus.ffprobe_error %]
+			<tr>
+				<td style="padding-right: 1em;"><b>[% 'PLUGIN_FFMPEG_STATUS_WARNING' | string %]</b></td>
+				<td colSpan="2" style="color: #c60;">[% ffmpegStatus.ffprobe_error | html %]</td>
+			</tr>
+			[% END %]
+			[% IF ffmpegConversion %]
+			<tr>
+				<td style="padding-right: 1em;"><b>[% 'PLUGIN_FFMPEG_STATUS_PROFILES' | string %]</b></td>
+				<td colSpan="2">
+					[% 'PLUGIN_FFMPEG_STATUS_PROFILES_COUNT' | string %] [% ffmpegConversion.profiles %]
+					([% 'PLUGIN_FFMPEG_STATUS_DSD_PROFILES_COUNT' | string %] [% ffmpegConversion.dsd_profiles %])
+				</td>
+			</tr>
+			[% END %]
+		</table>
+	[% END %]
+[% END %]
+[% END %]
+
+[% WRAPPER settingSection %]
+	[% WRAPPER settingGroup title="PLUGIN_FFMPEG_BINARY_SECTION" desc="PLUGIN_FFMPEG_BINARY_SECTION_DESC" %]
+		<label class="stdlabel" for="ffmpegPath">[% 'PLUGIN_FFMPEG_FFMPEG_PATH' | string %]</label><br/>
+		<input type="text" class="stdedit" name="pref_ffmpeg" id="ffmpegPath" value="[% prefs.pref_ffmpeg | html %]" size="70" placeholder="/usr/bin/ffmpeg"/><br/>
+		<div class="prefDesc">[% 'PLUGIN_FFMPEG_FFMPEG_PATH_DESC' | string %]</div>
+		<br/>
+		<label class="stdlabel" for="ffprobePath">[% 'PLUGIN_FFMPEG_FFPROBE_PATH' | string %]</label><br/>
+		<input type="text" class="stdedit" name="pref_ffprobe" id="ffprobePath" value="[% prefs.pref_ffprobe | html %]" size="70" placeholder="/usr/bin/ffprobe"/><br/>
+		<div class="prefDesc">[% 'PLUGIN_FFMPEG_FFPROBE_PATH_DESC' | string %]</div>
+		<br/>
+		<input type="checkbox" class="stdedit" name="pref_fallbackToSystem" id="fallbackToSystem" value="1" [% IF prefs.pref_fallbackToSystem %]checked="checked"[% END %]/>
+		<label class="stdlabel" for="fallbackToSystem">[% 'PLUGIN_FFMPEG_FALLBACK_TO_SYSTEM' | string %]</label>
+		<div class="prefDesc">[% 'PLUGIN_FFMPEG_FALLBACK_TO_SYSTEM_DESC' | string %]</div>
+	[% END %]
+[% END %]
+
+[% WRAPPER settingSection %]
+	[% WRAPPER settingGroup title="PLUGIN_FFMPEG_MODE_SECTION" desc="PLUGIN_FFMPEG_MODE_SECTION_DESC" %]
+		<select class="stdedit" name="pref_mode" id="mode">
+			<option [% IF prefs.pref_mode != 'prefer' %]selected="selected" [% END %]value="fallback">[% 'PLUGIN_FFMPEG_MODE_FALLBACK' | string %]</option>
+			<option [% IF prefs.pref_mode == 'prefer' %]selected="selected" [% END %]value="prefer">[% 'PLUGIN_FFMPEG_MODE_PREFER' | string %]</option>
+		</select>
+		<div class="prefDesc">[% 'PLUGIN_FFMPEG_MODE_DESC' | string %]</div>
+	[% END %]
+[% END %]
+
+[% WRAPPER settingSection %]
+	[% WRAPPER settingGroup title="PLUGIN_FFMPEG_DSD_SECTION" desc="PLUGIN_FFMPEG_DSD_SECTION_DESC" %]
+		<input type="checkbox" class="stdedit" name="pref_enableDSD" id="enableDSD" value="1" [% IF prefs.pref_enableDSD %]checked="checked"[% END %]/>
+		<label class="stdlabel" for="enableDSD">[% 'PLUGIN_FFMPEG_ENABLE_DSD' | string %]</label>
+		<div class="prefDesc">[% 'PLUGIN_FFMPEG_ENABLE_DSD_DESC' | string %]</div>
+	[% END %]
+[% END %]
+
+[% PROCESS settings/footer.html %]

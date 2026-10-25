@@ -1,0 +1,141 @@
+# String file for the FFmpeg plugin
+
+PLUGIN_FFMPEG
+	EN	FFmpeg
+	DE	FFmpeg
+
+PLUGIN_FFMPEG_DESCRIPTION
+	EN	Use ffmpeg to decode all audio formats supported by Lyrion Music Server (transcoding only)
+	DE	FFmpeg zur Dekodierung aller von Lyrion Music Server unterstützten Audioformate verwenden (nur Transkodierung)
+
+PLUGIN_FFMPEG_STATUS
+	EN	FFmpeg status
+	DE	FFmpeg-Status
+
+PLUGIN_FFMPEG_STATUS_DESC
+	EN	Information about the currently used ffmpeg/ffprobe binaries and the active conversion profiles.
+	DE	Informationen über die aktuell verwendeten ffmpeg/ffprobe-Programme und die aktiven Konvertierungsprofile.
+
+PLUGIN_FFMPEG_STATUS_BINARY
+	EN	Binary
+	DE	Programm
+
+PLUGIN_FFMPEG_STATUS_NOT_FOUND
+	EN	not found
+	DE	nicht gefunden
+
+PLUGIN_FFMPEG_STATUS_SOURCE
+	EN	Source
+	DE	Quelle
+
+PLUGIN_FFMPEG_SOURCE_CONFIGURED
+	EN	configured
+	DE	konfiguriert
+
+PLUGIN_FFMPEG_SOURCE_SYSTEM
+	EN	system
+	DE	System
+
+PLUGIN_FFMPEG_SOURCE_NONE
+	EN	none
+	DE	keine
+
+PLUGIN_FFMPEG_STATUS_VERSION
+	EN	ffmpeg version
+	DE	ffmpeg-Version
+
+PLUGIN_FFMPEG_STATUS_FFPROBE
+	EN	ffprobe
+	DE	ffprobe
+
+PLUGIN_FFMPEG_STATUS_FFPROBE_VERSION
+	EN	ffprobe version
+	DE	ffprobe-Version
+
+PLUGIN_FFMPEG_STATUS_ERROR
+	EN	Error
+	DE	Fehler
+
+PLUGIN_FFMPEG_STATUS_WARNING
+	EN	Warning
+	DE	Warnung
+
+PLUGIN_FFMPEG_STATUS_PROFILES
+	EN	Conversion profiles
+	DE	Konvertierungsprofile
+
+PLUGIN_FFMPEG_STATUS_PROFILES_COUNT
+	EN	active ffmpeg profiles:
+	DE	aktive ffmpeg-Profile:
+
+PLUGIN_FFMPEG_STATUS_DSD_PROFILES_COUNT
+	EN	of which DSD:
+	DE	davon DSD:
+
+PLUGIN_FFMPEG_BINARY_SECTION
+	EN	FFmpeg binaries
+	DE	FFmpeg-Programme
+
+PLUGIN_FFMPEG_BINARY_SECTION_DESC
+	EN	Leave the fields empty to let Lyrion Music Server find ffmpeg in the system PATH. If a path is configured, that exact executable is used.
+	DE	Felder leer lassen, damit Lyrion Music Server ffmpeg im System-PATH findet. Ist ein Pfad konfiguriert, wird genau dieses Programm verwendet.
+
+PLUGIN_FFMPEG_FFMPEG_PATH
+	EN	ffmpeg executable
+	DE	ffmpeg-Programm
+
+PLUGIN_FFMPEG_FFMPEG_PATH_DESC
+	EN	Absolute path to the ffmpeg binary, e.g. /usr/bin/ffmpeg.
+	DE	Absoluter Pfad zum ffmpeg-Programm, z. B. /usr/bin/ffmpeg.
+
+PLUGIN_FFMPEG_FFPROBE_PATH
+	EN	ffprobe executable
+	DE	ffprobe-Programm
+
+PLUGIN_FFMPEG_FFPROBE_PATH_DESC
+	EN	Absolute path to the ffprobe binary. If empty, ffprobe next to the ffmpeg binary or in the system PATH is used.
+	DE	Absoluter Pfad zum ffprobe-Programm. Leer: ffprobe neben ffmpeg oder im System-PATH wird verwendet.
+
+PLUGIN_FFMPEG_FALLBACK_TO_SYSTEM
+	EN	Fall back to the system ffmpeg
+	DE	Auf System-ffmpeg zurückfallen
+
+PLUGIN_FFMPEG_FALLBACK_TO_SYSTEM_DESC
+	EN	If the configured binary is invalid or not executable, use a system-wide ffmpeg instead.
+	DE	Ist das konfigurierte Programm ungültig oder nicht ausführbar, stattdessen ein systemweites ffmpeg verwenden.
+
+PLUGIN_FFMPEG_MODE_SECTION
+	EN	Usage
+	DE	Verwendung
+
+PLUGIN_FFMPEG_MODE_SECTION_DESC
+	EN	Define whether ffmpeg is only used when no native converter is available, or whether ffmpeg is always preferred.
+	DE	Festlegen, ob ffmpeg nur verwendet wird, wenn kein nativer Konverter verfügbar ist, oder ob ffmpeg immer bevorzugt wird.
+
+PLUGIN_FFMPEG_MODE_FALLBACK
+	EN	fallback: native converters first, ffmpeg only if needed
+	DE	Fallback: zuerst native Konverter, ffmpeg nur bei Bedarf
+
+PLUGIN_FFMPEG_MODE_PREFER
+	EN	prefer: always use ffmpeg first
+	DE	Bevorzugen: immer zuerst ffmpeg verwenden
+
+PLUGIN_FFMPEG_MODE_DESC
+	EN	This changes the order of the conversion profile instances only; it does not modify any scanner or tag handling.
+	DE	Dies ändert nur die Reihenfolge der Konvertierungsprofile; Scanner- oder Tag-Verarbeitung bleibt unberührt.
+
+PLUGIN_FFMPEG_DSD_SECTION
+	EN	DSD (experimental)
+	DE	DSD (experimentell)
+
+PLUGIN_FFMPEG_DSD_SECTION_DESC
+	EN	Enable experimental DSD conversion (dsf/dff/WavPack DSD to FLAC at 176400Hz).
+	DE	Experimentelle DSD-Konvertierung aktivieren (dsf/dff/WavPack-DSD nach FLAC mit 176400 Hz).
+
+PLUGIN_FFMPEG_ENABLE_DSD
+	EN	Enable DSD conversion
+	DE	DSD-Konvertierung aktivieren
+
+PLUGIN_FFMPEG_ENABLE_DSD_DESC
+	EN	When disabled (the default), dff/dsf/wvpx ffmpeg profiles are removed and DSD playback is left to the native converters.
+	DE	Wenn deaktiviert (Standard), werden dff/dsf/wvpx-ffmpeg-Profile entfernt und DSD-Wiedergabe den nativen Konvertern überlassen.
