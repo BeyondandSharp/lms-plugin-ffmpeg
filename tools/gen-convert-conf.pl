@@ -34,20 +34,34 @@ my @SOURCES = qw(
 # removed at runtime by Plugins::FFmpeg::Conversion when DSD is disabled.
 my @DSD_SOURCES = qw( dff dsf wvpx );
 
-# Output formats we can produce.  Lossless FLAC, MP3, raw PCM and AIFF.
-my @OUTPUTS = qw( flc mp3 pcm aif );
+# Output formats we can produce.  Lossless FLAC, the lossy MP3/AAC/Vorbis/Opus
+# targets (which support LMS' Maximum Bitrate through the B capability), raw
+# PCM and AIFF.
+my @OUTPUTS = qw( flc mp3 aac ogg ops pcm aif );
+
+# Lossy outputs whose bitrate can be limited by LMS' Maximum Bitrate setting.
+# These get the B:{BITRATE=-b:a %Bk} capability and use the $BITRATE$
+# placeholder in their command line.
+my @BITRATE_OUTPUTS = qw( mp3 aac ogg ops );
 
 # For DSD sources only FLAC output is offered; DSD is resampled to 176400Hz
 # (or to the player's limit via the D capability).
 my @DSD_OUTPUTS = qw( flc );
 
-# ffmpeg output arguments per output format.
+# ffmpeg output arguments per output format.  The lossy formats declare a
+# sensible default bitrate and add $BITRATE$ so that LMS' Maximum Bitrate
+# setting (-b:a <k>k via the B capability) overrides it.
 my %CODEC_ARGS = (
 	flc => '-c:a flac -f flac',
 	mp3 => '-c:a libmp3lame -q:a $QUALITY$ $BITRATE$ -f mp3',
+	aac => '-c:a aac -b:a 192k $BITRATE$ -f adts',
+	ogg => '-c:a libvorbis -b:a 192k $BITRATE$ -f ogg',
+	ops => '-c:a libopus -b:a 128k $BITRATE$ -f ogg',
 	pcm => '-c:a pcm_s16le -f s16le',
 	aif => '-c:a pcm_s16be -f aiff',
 );
+
+my %BITRATE_OUTPUT = map { $_ => 1 } @BITRATE_OUTPUTS;
 
 # Common ffmpeg arguments.  -nostdin makes sure ffmpeg does not consume the
 # server's stdin, -vn/-sn/-dn drops video/subtitle/data streams and
@@ -59,7 +73,7 @@ sub capabilities {
 	my ($mode, $output) = @_;
 
 	my $caps = $mode;
-	$caps .= 'B:{BITRATE=-b:a %Bk}' if $output eq 'mp3';
+	$caps .= 'B:{BITRATE=-b:a %Bk}' if $BITRATE_OUTPUT{$output};
 	$caps .= 'T:{START=-ss %s}U:{END=-t %w}D:{RESAMPLE=-ar %d}';
 
 	return $caps;

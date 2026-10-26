@@ -15,11 +15,17 @@ my @SOURCES  = qw(
 	wma wmal wmap wvp wvpx ac3 eac3 dts truehd
 );
 my @DSD_SOURCES = qw( dff dsf wvpx );
-my @OUTPUTS     = qw( flc mp3 pcm aif );
+my @OUTPUTS     = qw( flc mp3 aac ogg ops pcm aif );
+
+# Lossy outputs which expose LMS' Maximum Bitrate ("B" capability).
+my %BITRATE_OUTPUT = map { $_ => 1 } qw( mp3 aac ogg ops );
 
 my %CODING = (
 	flc => qr/-c:a flac -f flac/,
 	mp3 => qr/-c:a libmp3lame -q:a \$QUALITY\$ \$BITRATE\$ -f mp3/,
+	aac => qr/-c:a aac -b:a 192k \$BITRATE\$ -f adts/,
+	ogg => qr/-c:a libvorbis -b:a 192k \$BITRATE\$ -f ogg/,
+	ops => qr/-c:a libopus -b:a 128k \$BITRATE\$ -f ogg/,
 	pcm => qr/-c:a pcm_s16le -f s16le/,
 	aif => qr/-c:a pcm_s16be -f aiff/,
 );
@@ -140,7 +146,7 @@ for my $pair (keys %seen) {
 	ok(grep({ $_ eq $pair } @expected), "$pair is an expected profile");
 }
 
-is(scalar(@expected), 98, 'expected number of conversions');
+is(scalar(@expected), 170, 'expected number of conversions');
 is(scalar(@entries), 2 * scalar(@expected), 'two profiles per conversion');
 
 # ----------------------------------------------------------------------------
@@ -178,11 +184,13 @@ for my $entry (@entries) {
 	like($caps, qr/U:\{END=-t %w\}/,    "$input->$output has END capability");
 	like($caps, qr/D:\{RESAMPLE=-ar %d\}/, "$input->$output has RESAMPLE capability");
 
-	if ($output eq 'mp3') {
+	if ($BITRATE_OUTPUT{$output}) {
 		like($caps, qr/B:\{BITRATE=-b:a %Bk\}/, "$input->$output has BITRATE capability");
+		like($command, qr/ \$BITRATE\$ /, "$input->$output passes the bitrate to ffmpeg");
 	}
 	else {
 		unlike($caps, qr/B:/, "$input->$output has no BITRATE capability");
+		unlike($command, qr/\$BITRATE\$/, "$input->$output does not use the bitrate placeholder");
 	}
 
 	like($command, qr/^\[ffmpeg\] -hide_banner -loglevel error -nostdin /,

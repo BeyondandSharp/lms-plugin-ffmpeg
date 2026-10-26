@@ -19,6 +19,26 @@ my $NATIVE_FLAC = '[flac] -dcs --force-raw-format --endian=little --sign=signed 
 my $NATIVE_FAAD = '[faad] -q -w -f 2 -b 1 $FILE$';
 my $NATIVE_SOX  = '[sox] -q -t ogg $FILE$ -t raw -r 44100 -c 2 -2 -s -';
 
+# Lossy output profiles added in 0.2.0 (LMS Maximum Bitrate targets).  The
+# B capability has to survive the re-ordering like any other capability.
+my %LOSSY = (
+	aac => '-c:a aac -b:a 192k $BITRATE$ -f adts',
+	ogg => '-c:a libvorbis -b:a 192k $BITRATE$ -f ogg',
+	ops => '-c:a libopus -b:a 128k $BITRATE$ -f ogg',
+);
+
+sub ffmpeg_cmd {
+	my ($input, $codec_args) = @_;
+
+	return '[ffmpeg] -hide_banner -loglevel error -nostdin $START$ -i '
+		. $input
+		. ' $END$ -vn -sn -dn -map 0:a:0 $RESAMPLE$ -ac $OCHANNELS$ '
+		. $codec_args . ' -';
+}
+
+sub lossy_caps { return { F => 'noArgs', B => 'BITRATE=-b:a %Bk', E => {} } }
+sub lossy_caps_remote { return { R => 'noArgs', B => 'BITRATE=-b:a %Bk', E => {} } }
+
 sub native_caps { return { I => 'noArgs', F => 'noArgs', E => {} } }
 
 my %CAPS = (
@@ -44,6 +64,13 @@ my %CAPS = (
 	'wvpx-flc-*-*-1'  => { R => 'noArgs', E => {} },
 	'wvpx-mp3-*-*'    => { F => 'noArgs', E => {} },
 	'wvpx-mp3-*-*-1'  => { R => 'noArgs', E => {} },
+	# lossy outputs with the Maximum Bitrate capability
+	'flc-aac-*-*'     => lossy_caps(),
+	'flc-aac-*-*-1'   => lossy_caps_remote(),
+	'flc-ogg-*-*'     => lossy_caps(),
+	'flc-ogg-*-*-1'   => lossy_caps_remote(),
+	'flc-ops-*-*'     => lossy_caps(),
+	'flc-ops-*-*-1'   => lossy_caps_remote(),
 	# native profiles of other content types which must not be touched
 	'ogg-pcm-*-*'     => native_caps(),
 	'mp3-mp3-*-*'     => { I => 'noArgs', F => 'noArgs', E => {} },
@@ -76,6 +103,13 @@ sub fresh_table {
 		'wvpx-flc-*-*-1'  => $FFMPEG_DSD,
 		'wvpx-mp3-*-*'    => $FFMPEG_F,
 		'wvpx-mp3-*-*-1'  => $FFMPEG_R,
+		(map {
+			my $output = $_;
+			(
+				"flc-$output-*-*"    => ffmpeg_cmd('$FILE$', $LOSSY{$output}),
+				"flc-$output-*-*-1"  => ffmpeg_cmd('$URL$',  $LOSSY{$output}),
+			)
+		} keys %LOSSY),
 		'ogg-pcm-*-*'     => $NATIVE_SOX,
 		'mp3-mp3-*-*'     => '-',
 		'vop-flc-*-*'     => $FFMPEG_F,
@@ -158,6 +192,27 @@ subtest 'prefer mode: ffmpeg first' => sub {
 
 	ok($caps->{'flc-pcm-*-*'}->{T}, 'ffmpeg base got the ffmpeg capabilities');
 	ok($caps->{'flc-pcm-*-*-2'}->{I}, 'native -2 keeps native capabilities');
+};
+
+# ----------------------------------------------------------------------------
+subtest 'lossy output profiles keep their BITRATE capability' => sub {
+	my ($cmd, $caps) = fresh_table();
+	init_conversion($cmd, $caps, mode => 'fallback', enableDSD => 0);
+
+	for my $output (sort keys %LOSSY) {
+		like($cmd->{"flc-$output-*-*"}, qr/-i \$FILE\$/, "$output base profile reads the local file");
+		like($cmd->{"flc-$output-*-*-1"}, qr/-i \$URL\$/, "$output -1 profile reads the remote URL");
+		like($cmd->{"flc-$output-*-*"}, qr/\$BITRATE\$/, "$output command uses the BITRATE placeholder");
+
+		is($caps->{"flc-$output-*-*"}->{B}, 'BITRATE=-b:a %Bk', "$output base keeps the BITRATE capability");
+		is($caps->{"flc-$output-*-*-1"}->{B}, 'BITRATE=-b:a %Bk', "$output -1 keeps the BITRATE capability");
+		is($caps->{"flc-$output-*-*"}->{F}, 'noArgs', "$output base keeps the F capability");
+		is($caps->{"flc-$output-*-*-1"}->{R}, 'noArgs', "$output -1 keeps the R capability");
+	}
+
+	like($cmd->{'flc-aac-*-*'}, qr/-f adts/, 'AAC output uses the ADTS muxer');
+	like($cmd->{'flc-ogg-*-*'}, qr/-f ogg/, 'Ogg Vorbis output uses the Ogg muxer');
+	like($cmd->{'flc-ops-*-*'}, qr/-f ogg/, 'Opus output uses the Ogg muxer');
 };
 
 # ----------------------------------------------------------------------------
