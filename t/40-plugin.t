@@ -134,6 +134,22 @@ subtest 'initPlugin initialises binary, conversion and dispatch' => sub {
 	ok(!exists $Slim::Player::TranscodingHelper::commandTable{'dff-flc-*-*'}, 'DSD profiles are disabled by default');
 };
 
+subtest 'optional codec_capabilities does not disturb the running plugin' => sub {
+	my $before = Plugins::FFmpeg::Conversion->status->{profiles};
+
+	my $caps = Plugins::FFmpeg::Plugin->codec_capabilities();
+
+	is($caps->{provider}, 'ffmpeg', 'provider is ffmpeg');
+	is($caps->{priority}, 100, 'priority is 100');
+	is_deeply($caps->{encode}[0]{to}, [qw( flc mp3 aac ogg ops aif )],
+		'encode targets include the new lossy formats');
+	is(Plugins::FFmpeg::Conversion->status->{profiles}, $before,
+		'calling codec_capabilities leaves the active profiles untouched');
+	is($Slim::Player::TranscodingHelper::commandTable{'flc-pcm-*-*'}, $NATIVE_FLAC,
+		'conversion table ordering is unchanged');
+};
+
+# ----------------------------------------------------------------------------
 subtest 'preference change callbacks' => sub {
 	ok(scalar @{ $prefs->changes->{mode} }, 'mode change callback registered');
 	ok(scalar @{ $prefs->changes->{enableDSD} }, 'enableDSD change callback registered');

@@ -22,12 +22,15 @@
 * 覆盖所有音频源格式：
   `aac alc alcx ape aif flc mp3 mp4 mp4x mpc ogg ogf ops pcm sls wav wma wmal
   wmap wvp wvpx ac3 eac3 dts truehd`，启用 DSD 时还包括 `dff dsf wvpx`。
-* 输出格式：FLAC（`flc`）、MP3（`mp3`）、原始 PCM（`pcm`）和 AIFF（`aif`）。
+* 输出格式：FLAC（`flc`）、MP3（`mp3`）、AAC（`aac`，ADTS）、Ogg Vorbis
+  （`ogg`）、Opus（`ops`，Ogg）、原始 PCM（`pcm`）和 AIFF（`aif`）。
   源格式与目标格式相同时不会生成配置。
 * 同时支持本地文件（`$FILE$`，能力 `F`）和远程流（`$URL$`，能力 `R`）。
 * 通过 LMS 标准能力支持拖动定位（`-ss`）、时长限制（`-t`）和降采样（`-ar`）：
   `T`/`U`/`D`。
-* MP3 输出支持限速（`B` 能力，`-b:a`）。
+* 支持 LMS 的 **最大比特率**（Maximum Bitrate）：MP3、AAC、Ogg Vorbis 和
+  Opus 等有损输出声明 `B:{BITRATE=-b:a %Bk}` 能力，并通过 `$BITRATE$`
+  占位符把码率传给 ffmpeg。
 * 提供仅供转换使用的 `ac3`、`eac3`、`dts`、`truehd` 配置，供
   [PlayVideo](../lms-plugin-playvideo) 插件作为外部解码器使用。
 * 实验性 DSD 支持（默认关闭）：将 dsf/dff/WavPack-DSD 以 176400 Hz 转换为
@@ -41,7 +44,8 @@
 
 * Lyrion Music Server 9.0.0 或更新版本。
 * 一个 `ffmpeg` 可执行文件（建议 4.x 及以上，已在 6.x/7.x 上测试）。需要包含
-  要播放格式对应的解码器，以及 MP3 输出所需的 `libmp3lame` 等编码器。
+  要播放格式对应的解码器，以及所需输出格式的编码器：`libmp3lame`（MP3）、
+  原生 `aac` 编码器（AAC）、`libvorbis`（Ogg Vorbis）和 `libopus`（Opus）。
 * 同一发行版中的 `ffprobe`（用于版本检测，PlayVideo 等插件也会使用）。
 
 本插件**不捆绑、不下载** ffmpeg，请通过操作系统或软件包管理器安装。
@@ -132,14 +136,23 @@ DSD 会立即重排转码配置表。
 | ---- | ---- |
 | `flc` | `-ac $OCHANNELS$ -c:a flac -f flac -` |
 | `mp3` | `-ac $OCHANNELS$ -c:a libmp3lame -q:a $QUALITY$ $BITRATE$ -f mp3 -` |
+| `aac` | `-ac $OCHANNELS$ -c:a aac -b:a 192k $BITRATE$ -f adts -` |
+| `ogg` | `-ac $OCHANNELS$ -c:a libvorbis -b:a 192k $BITRATE$ -f ogg -` |
+| `ops` | `-ac $OCHANNELS$ -c:a libopus -b:a 128k $BITRATE$ -f ogg -` |
 | `pcm` | `-ac $OCHANNELS$ -c:a pcm_s16le -f s16le -` |
 | `aif` | `-ac $OCHANNELS$ -c:a pcm_s16be -f aiff -` |
+
+AAC、Vorbis 和 Opus 使用合理的默认码率（分别为 `192k`/`192k`/`128k`），
+MP3 保持原有的 VBR 质量（`-q:a $QUALITY$`）。启用 LMS 最大比特率时，
+`$BITRATE$` 占位符展开的 `-b:a <k>k` 会覆盖默认值。
 
 能力行：
 
 * 本地文件：`FT:{START=-ss %s}U:{END=-t %w}D:{RESAMPLE=-ar %d}`；
 * 远程 URL：`RT:...`；
-* MP3 输出额外包含 `B:{BITRATE=-b:a %Bk}`。
+* MP3、AAC、Ogg Vorbis 和 Opus 等有损输出额外声明
+  `B:{BITRATE=-b:a %Bk}`（LMS 最大比特率），`$BITRATE$` 会被替换为
+  `-b:a <k>k`。
 
 `custom-convert.conf` 由 [`tools/gen-convert-conf.pl`](tools/gen-convert-conf.pl)
 生成并提交到仓库：
@@ -150,6 +163,37 @@ make test          # 校验已提交的文件是最新的
 ```
 
 请勿手工修改 `custom-convert.conf`。
+
+## 可选的编解码能力声明
+
+插件提供一个可选、无副作用的类方法，其它插件（例如编解码选择插件）可以用它
+发现本插件能提供哪些转换：
+
+```perl
+my $caps = Plugins::FFmpeg::Plugin->codec_capabilities();
+
+# {
+#   provider => 'ffmpeg',
+#   priority => 100,
+#   decode   => [ { from  => [ <所有支持的源格式> ],
+#                   to    => ['pcm', 'flc'],
+#                   scope => ['local', 'remote'] } ],
+#   encode   => [ { from    => ['pcm', 'flc'],
+#                   to      => ['flc', 'mp3', 'aac', 'ogg', 'ops', 'aif'],
+#                   scope   => ['local', 'remote'],
+#                   bitrate => 1 } ],
+# }
+```
+
+* `provider`/`priority` 标识提供方（100 为 ffmpeg 插件的默认优先级）；
+* `decode` 描述 ffmpeg 能解码为 PCM 或 FLAC 的源格式；
+* `encode` 描述可输出的目标格式，本地文件和远程流都支持；
+  `bitrate => 1` 表示有损目标支持 `B`（最大比特率）能力；
+* `decode` 中包含 DSD 源格式，但这些配置只有在启用 `enableDSD` 时才生效。
+
+该方法完全是可选的：插件内部不会调用它，不会探测任何可执行文件，也不会读取
+配置。FFmpeg 插件可独立工作，不依赖任何调用方插件。声明与运行时配置处理使用
+同一份源格式列表，因此不会与 `custom-convert.conf` 脱节（单元测试会校验）。
 
 ## CLI
 
@@ -203,8 +247,12 @@ prove -l t
   `%binaries` 集成）；
 * 生成的 `custom-convert.conf`（与生成器一致、配置矩阵、命令、能力、DSD 段、
   无 identity 转换）；
-* 使用合成转码表验证重排/重编号（fallback、prefer、DSD 开关、程序可用性）；
-* 插件装配（配置项默认值、CLI 注册、配置变更回调）。
+* 使用合成转码表验证重排/重编号（fallback、prefer、DSD 开关、程序可用性、
+  有损输出配置的 BITRATE 能力）；
+* 插件装配（配置项默认值、CLI 注册、配置变更回调）；
+* 可选的 `codec_capabilities` 声明（结构、provider/priority、decode/encode
+  边、最大比特率标记、与 `custom-convert.conf` 一致、不探测程序、不依赖
+  CodecSwitch）。
 
 需要真实 LMS 的测试在没有设置 `LMS_HOME` 时会自动跳过。
 
@@ -261,6 +309,8 @@ prove -l t
   将模式切换为 `prefer`。
 * **MP3 输出失败**：ffmpeg 可能未编译 `libmp3lame`，可用
   `ffmpeg -encoders | grep libmp3lame` 检查。
+* **AAC/Ogg Vorbis/Opus 输出失败**：ffmpeg 可能缺少原生 `aac` 编码器、
+  `libvorbis` 或 `libopus`，可用 `ffmpeg -encoders` 检查。
 * **DSD**：属于实验性功能，只有启用 `enableDSD` 时才会添加 dff/dsf/wvpx
   配置；不影响原生 DSD 直通。
 

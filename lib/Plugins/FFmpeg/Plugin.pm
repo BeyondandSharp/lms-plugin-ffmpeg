@@ -91,6 +91,57 @@ sub shutdownPlugin {
 	return;
 }
 
+# ----------------------------------------------------------------------------
+# optional codec capability declaration
+# ----------------------------------------------------------------------------
+#
+# Other plugins (for example a codec selection plugin) may ask this plugin
+# which conversions it can provide.  The method is optional: nothing in this
+# plugin calls it and the plugin works standalone without any consumer.
+#
+# It is deliberately cheap: it returns a static description derived from the
+# profile generator contract (tools/gen-convert-conf.pl) and the source list
+# of Plugins::FFmpeg::Conversion.  No binary is executed, no preference is
+# evaluated and the conversion table is not modified.
+#
+# The DSD source types are part of the decode list as well, because the
+# plugin can decode them; their profiles only become active while the
+# experimental plugin.ffmpeg enableDSD preference is enabled, so consumers
+# should treat DSD support as optional.
+sub codec_capabilities {
+	my $class = shift;
+
+	my @sources = Plugins::FFmpeg::Conversion->sources;
+
+	return {
+		provider => 'ffmpeg',
+		priority => 100,
+
+		# ffmpeg decodes every supported source type into PCM or FLAC,
+		# for local files ("F") and remote streams ("R") alike.
+		decode => [
+			{
+				from  => [@sources],
+				to    => [qw( pcm flc )],
+				scope => [qw( local remote )],
+			},
+		],
+
+		# PCM and FLAC can be encoded into every output produced by
+		# custom-convert.conf.  bitrate => 1 marks that LMS' Maximum
+		# Bitrate setting ("B" capability) is honoured by the lossy
+		# targets (mp3/aac/ogg/ops); the lossless/PCM targets ignore it.
+		encode => [
+			{
+				from    => [qw( pcm flc )],
+				to      => [qw( flc mp3 aac ogg ops aif )],
+				scope   => [qw( local remote )],
+				bitrate => 1,
+			},
+		],
+	};
+}
+
 sub _binaryPrefsChanged {
 	my ($pref, $new, $obj, $old) = @_;
 
@@ -197,6 +248,33 @@ supports.  The ffmpeg binary can either be configured explicitly
 plugin.ffmpeg:mode preference ffmpeg is used as a fallback (native converters
 first) or preferred (ffmpeg first).  DSD support is experimental and off by
 default.
+
+=head1 OPTIONAL PLUGIN API
+
+=over 4
+
+=item C<codec_capabilities>
+
+Returns a side effect free description of the conversions this plugin
+provides:
+
+  {
+    provider => 'ffmpeg',
+    priority => 100,
+    decode   => [ { from => [...all source types...],
+                    to   => ['pcm', 'flc'],
+                    scope => ['local', 'remote'] } ],
+    encode   => [ { from => ['pcm', 'flc'],
+                    to   => ['flc', 'mp3', 'aac', 'ogg', 'ops', 'aif'],
+                    scope => ['local', 'remote'],
+                    bitrate => 1 } ],
+  }
+
+The method is optional and never probes the ffmpeg binary or changes the
+conversion table.  Other plugins may use it to negotiate codec support; the
+FFmpeg plugin itself does not depend on any consumer being installed.
+
+=back
 
 =head1 CLI
 

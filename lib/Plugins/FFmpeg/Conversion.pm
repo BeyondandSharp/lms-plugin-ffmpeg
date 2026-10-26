@@ -44,6 +44,17 @@ my %OUR_SOURCE = map { $_ => 1 } @OUR_SOURCES;
 
 my %DSD_SOURCE = map { $_ => 1 } qw( dff dsf wvpx );
 
+# The source content types this plugin contributes ffmpeg profiles for.
+# Exposed so that the optional capability declaration of the plugin
+# (Plugins::FFmpeg::Plugin->codec_capabilities) and the runtime profile
+# handling above use the same list.  This is a plain constant accessor and
+# never probes the ffmpeg binary.
+sub sources {
+	my $class = shift;
+
+	return @OUR_SOURCES;
+}
+
 my %STATE = (
 	initialized => 0,
 	cmd         => undef,
