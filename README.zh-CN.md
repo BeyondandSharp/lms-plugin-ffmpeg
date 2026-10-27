@@ -1,5 +1,7 @@
 # Lyrion Music Server 插件：FFmpeg
 
+![GitHub Release](https://img.shields.io/github/v/release/BeyondandSharp/lms-plugin-ffmpeg)
+
 [English README](README.md)
 
 这是一个面向 [Lyrion Music Server](https://lyrion.org/)（LMS 9.x）的转码插件，

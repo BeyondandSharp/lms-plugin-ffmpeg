@@ -1,5 +1,7 @@
 # Lyrion Music Server plugin: FFmpeg
 
+![GitHub Release](https://img.shields.io/github/v/release/BeyondandSharp/lms-plugin-ffmpeg)
+
 [中文说明](README.zh-CN.md)
 
 A transcoding plugin for [Lyrion Music Server](https://lyrion.org/) (LMS 9.x)
