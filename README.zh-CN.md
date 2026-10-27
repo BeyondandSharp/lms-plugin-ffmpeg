@@ -1,5 +1,7 @@
 # Lyrion Music Server 插件：FFmpeg
 
+[English README](README.md)
+
 这是一个面向 [Lyrion Music Server](https://lyrion.org/)（LMS 9.x）的转码插件，
 让 LMS 可以使用 ffmpeg 解码 **LMS 支持的所有音频格式**。
 

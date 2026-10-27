@@ -1,5 +1,7 @@
 # Lyrion Music Server plugin: FFmpeg
 
+[中文说明](README.zh-CN.md)
+
 A transcoding plugin for [Lyrion Music Server](https://lyrion.org/) (LMS 9.x)
 which enables ffmpeg as an audio decoder for **all audio formats LMS supports**.
 
